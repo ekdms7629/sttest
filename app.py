@@ -1,7 +1,30 @@
 from openai import OpenAI
 import streamlit as st
 
-st.title("무엇이든 물어보살")
+import os
+import streamlit as st
+from openai import OpenAI
+
+# --- 비밀번호 설정 ---
+PASSWORD = "0208"
+
+# 인증 상태 저장
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+# 인증이 안 된 경우 로그인 화면만 보여줌
+if not st.session_state.authenticated:
+    st.title("🔐 다은이의 생일은 언제게~")
+    password = st.text_input("숫자 네자리입니다!", type="password")
+    if st.button("로그인"):
+        if password == PASSWORD:
+            st.session_state.authenticated = True
+            st.success("정답입니다람쥐!")
+            st.experimental_rerun()
+        else:
+            st.error("꺼지세요.")
+    st.stop() 
+st.title("무엇이든 물어보살🤖")
 
 client = OpenAI()
 
@@ -15,7 +38,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("What is up?"):
+if prompt := st.chat_input("친절하게 대답해드립니다람쥐"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -31,3 +54,4 @@ if prompt := st.chat_input("What is up?"):
         )
         response = st.write_stream(stream)
     st.session_state.messages.append({"role": "assistant", "content": response})
+
