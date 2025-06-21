@@ -20,7 +20,7 @@ if not st.session_state.authenticated:
         if password == PASSWORD:
             st.session_state.authenticated = True
             st.success("정답입니다람쥐!")
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.error("꺼지세요.")
     st.stop() 
