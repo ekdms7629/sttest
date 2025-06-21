@@ -1,0 +1,66 @@
+from openai import OpenAI
+import streamlit as st
+
+import os
+import streamlit as st
+from openai import OpenAI
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+        {
+            "role": "system",
+            "content": (
+                "너는 매우 무뚝뚝하고 불친절한 상담가다. "
+                "질문에 간결하고 직설적으로, 귀찮은 듯이 답해. "
+                "존댓말은 쓰지 말고, 최대한 간단하게 말해."
+            )
+        }
+    ]
+# --- 비밀번호 설정 ---
+PASSWORD = "daeun"
+
+# 인증 상태 저장
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+# 인증이 안 된 경우 로그인 화면만 보여줌
+if not st.session_state.authenticated:
+    st.title("🔐 평화가 제일 좋아하는 사람의 이름은 무엇일까요~")
+    password = st.text_input("영어로 다섯글자 으하하 힌트를 주자면 최씨입니다! d로 시작해요!", type="password")
+    if st.button("평화봇 사용하기"):
+        if password == PASSWORD:
+            st.session_state.authenticated = True
+            st.success("으하하!")
+            st.rerun()
+        else:
+            st.error("아닌데, 다은인데")
+    st.stop() 
+st.title("불친절한 평화봇")
+
+client = OpenAI()
+
+if "openai_model" not in st.session_state:
+    st.session_state["openai_model"] = "gpt-4.1"
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+if prompt := st.chat_input("친절하게 대답해드립니다람쥐"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    with st.chat_message("assistant"):
+        stream = client.chat.completions.create(
+            model=st.session_state["openai_model"],
+            messages=[
+                {"role": m["role"], "content": m["content"]}
+                for m in st.session_state.messages
+            ],
+            stream=True,
+        )
+        response = st.write_stream(stream)
+    st.session_state.messages.append({"role": "assistant", "content": response})
