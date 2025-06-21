@@ -16,7 +16,7 @@ if "authenticated" not in st.session_state:
 if not st.session_state.authenticated:
     st.title("🔐 다은이의 생일은 언제게~")
     password = st.text_input("숫자 네자리입니다!", type="password")
-    if st.button("로그인"):
+    if st.button("다은봇 사용하기"):
         if password == PASSWORD:
             st.session_state.authenticated = True
             st.success("정답입니다람쥐!")
